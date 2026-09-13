@@ -85,7 +85,20 @@ class BrowserManager:
         """初始化浏览器"""
         log("正在初始化浏览器...")
 
+        # 如果已有 browser_path 参数，或通过全局设置读取：
+        import os
+        
         co = ChromiumOptions()
+        
+        # 如果指定了路径且文件存在，则强制指定浏览器路径
+        if hasattr(self, 'browser_path') and self.browser_path and os.path.exists(self.browser_path):
+            co.set_browser_path(self.browser_path)
+        elif os.path.exists("browser_path.txt"):
+            # 也支持在同目录下放一个 browser_path.txt 直接写死路径
+            with open("browser_path.txt", "r", encoding="utf-8") as f:
+                path = f.read().strip()
+                if os.path.exists(path):
+                    co.set_browser_path(path)
 
         # 设置代理
         if Config.PROXY:
